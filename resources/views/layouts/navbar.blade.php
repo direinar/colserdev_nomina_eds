@@ -1,0 +1,134 @@
+{{--
+    Menú responsive: en computador (lg y más) es la barra horizontal; en
+    celulares y tablets se abre con el botón ☰ como panel lateral (offcanvas)
+    con los submenús desplegados hacia abajo, sin salirse de la pantalla.
+    Los módulos de nómina (empleados, novedades, liquidación, informes) se
+    agregan aquí a medida que se construyen.
+--}}
+<nav class="navbar navbar-expand-lg navbar-light navbar-pastel shadow-sm sticky-top">
+
+    <div class="container-fluid">
+
+        <a class="navbar-brand d-flex align-items-center fw-bold" href="{{ route('dashboard') }}">
+            <img src="{{ asset('images/logo-dashboard-32.png') }}" alt="Logo" class="brand-logo me-2">
+            <span class="brand-text">ByH Nómina</span>
+        </a>
+
+        @auth
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu-principal"
+                aria-controls="menu-principal" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        @endauth
+
+        <div class="offcanvas offcanvas-end offcanvas-lg navbar-offcanvas" tabindex="-1" id="menu-principal"
+            aria-labelledby="menu-principal-titulo">
+
+            <div class="offcanvas-header border-bottom">
+                <div class="d-flex align-items-center">
+                    <img src="{{ asset('images/logo-dashboard-32.png') }}" alt="Logo" class="brand-logo me-2">
+                    <div>
+                        <h5 class="offcanvas-title fw-bold mb-0" id="menu-principal-titulo">ByH Nómina</h5>
+                        @auth
+                            <small class="text-muted">{{ auth()->user()->name }}</small>
+                        @endauth
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#menu-principal"
+                    aria-label="Cerrar menú"></button>
+            </div>
+
+            <div class="offcanvas-body d-flex flex-column flex-lg-row align-items-lg-center w-100">
+
+                {{-- ================= MENÚ ================= --}}
+                <ul class="navbar-nav me-lg-auto align-items-lg-center gap-lg-1">
+
+                    @auth
+
+                        @php($user = auth()->user())
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                                href="{{ route('dashboard') }}">
+                                Dashboard
+                            </a>
+                        </li>
+
+                        {{-- ADMINISTRACIÓN --}}
+                        @if ($user->isAdministrador())
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {{ request()->is('users*') ? 'active' : '' }}"
+                                    href="#" data-bs-toggle="dropdown">
+                                    Administración
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('users.index') }}">
+                                            Usuarios
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
+
+                    @endauth
+
+                </ul>
+
+                {{-- ================= Usuario y Logout ================= --}}
+                <ul class="navbar-nav navbar-usuario ms-lg-auto align-items-lg-center gap-2 mt-3 mt-lg-0 pt-3 pt-lg-0">
+
+                    @auth
+                        {{-- Se muestra solo cuando el navegador permite instalar la PWA (resources/js/pwa.js) --}}
+                        <li class="nav-item d-none" data-pwa-install>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-pwa-install-button
+                                title="Instalar Nómina como aplicación en este equipo">
+                                <i class="bi bi-download"></i> Instalar aplicación
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                {{ auth()->user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <span class="dropdown-item-text text-muted">
+                                        {{ auth()->user()->email }}
+                                    </span>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                        <i class="bi bi-person me-2"></i>Mi perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('security.edit') }}">
+                                        <i class="bi bi-shield-lock me-2"></i>Seguridad
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endauth
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
